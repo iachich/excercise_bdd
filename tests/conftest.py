@@ -1,5 +1,6 @@
 import pytest
 from temperature_control_unit import TemperatureControlUnit
+from pytest_bdd import given, when, then
 
 # Define a fixture to create an instance of TemperatureControlUnit
 @pytest.fixture(scope="session")
@@ -12,6 +13,7 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "bdd: mark a test as a BDD test")
 
 # Define a hook to inject the application instance into BDD steps
-def pytest_bdd_before_step(request, feature, scenario, step, step_func, step_func_args):
+@pytest.hookimpl(tryfirst=True)
+def pytest_bdd_before_step(request, feature, scenario, step, step_func):
     if "temperature_unit" in request.fixturenames:
-        step_func_args["temperature_unit"] = request.getfixturevalue("temperature_unit")
+        step_func(request.getfixturevalue("temperature_unit"))
